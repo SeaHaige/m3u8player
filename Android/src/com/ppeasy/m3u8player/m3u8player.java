@@ -240,8 +240,8 @@ public class m3u8player extends Activity
     private void init() {  
         webView = (WebView) findViewById(R.id.webView);   
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        //webView.loadUrl("file:///android_asset/index.html");   
-        webView.loadUrl("http://101.201.104.27/m3u8/");  
+        webView.loadUrl("file:///android_asset/index.html");   
+        //webView.loadUrl("http://101.201.104.27/m3u8/");  
         webView.addJavascriptInterface(new JsInteration(), "control");
         webView.setWebViewClient(new WebViewClient(){  
             @Override  
