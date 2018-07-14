@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>PPeasy M3U8</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css">
+<style>
+div.content-block{
+	margin:0px;
+	padding:0px;
+}
+div.list-block{
+	margin:0px;
+}
+</style>
+<script>
+pc_flag=0;
+if( navigator.userAgent.toLowerCase().indexOf("windows nt")>=0)
+{
+	pc_flag=1;
+}
+function getCookie(name)
+{
+var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+if(arr=document.cookie.match(reg))
+return unescape(arr[2]);
+else
+return null;
+} 
+function setCookie(c_name, value){
+　　　　var exdate=new Date();
+　　　　exdate.setDate(exdate.getDate() + 360);
+　　　　document.cookie=c_name+ "=" + escape(value) + ((360==null) ? "" : ";expires="+exdate.toGMTString());
+} 
+
+saveplaylist=getCookie("playlist");
+
+//alert(saveplaylist);
+//
+
+//desthost="192.168.1.34";
+desthost="127.0.0.1";
+port=0;
+showLoaderf=0;
+function hideLoader(){
+	showLoaderf=0;
+	$.hidePreloader();
+}
+var playlist={
+	"list":[
+		"http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8?wsSession=bd494f2a994302991e26d95d-152250956788391&wsIPSercert=e3a4055ad4a812447f77f6ff018b3264&wsMonitor=-1",
+		"http://123.108.164.71/etv2/phd847/playlist.m3u8",
+		"http://122.202.129.136:1935/live/ch4/playlist.m3u8",
+		"http://122.202.129.136:1935/live/ch5/playlist.m3u8",
+		"http://cbs-live.gscdn.com/cbs-live/cbs-live.stream/playlist.m3u8",
+		"http://192.168.1.34:7002/live/1.m3u8",
+		"http://111.118.21.79/etv1/phd28/playlist.m3u8"
+	]
+};	 
+if(saveplaylist!=null) playlist=JSON.parse(saveplaylist);
+//setCookie("playlist",JSON.stringify(playlist));		
+function p2ptest(devno, fid){ 
+	if(pc_flag)
+	{
+		playpc(devno);
+		return ;
+	}
+	//window.control.PlayPath(devno,0) ;		
+	//return;
+	var host=devno.substr(7).split("/")[0];  
+	
+	 var sucf=1;
+	if(port)
+	{
+		sucf=0;
+		$.ajax({
+             type: "GET",
+             url: "http://"+desthost+":1960/Close?Port="+port,
+             data: "",
+			 timeout:10000,  			 
+             dataType: "json",
+			 async:false, 
+             success: function(data){ 
+				if(data.result)
+					sucf=1;
+			 }
+			 }); 
+	}
+			 
+	var act="CreateRtmpService"; 
+	if(devno.substr(0,4)=="http")
+		act="CreateHlsService";
+	if(sucf)
+	$.ajax({
+             type: "GET",
+             url: "http://"+desthost+":1960/?Action="+act+"&Domain="+host,
+             data: "",
+			 timeout:100000,  			 
+             dataType: "json",
+			 error:function(jqXHR, textStatus, errorThrown){
+				if(textStatus=="timeout"){
+					alert("未检测到PPeasy服务，请安装PPeasy管理助手软件并启动服务!");				  
+				}else{				  
+				}
+			},
+             success: function(data){ 
+						port=data.port;
+						var newaddr=""+desthost+":"+port+devno.substr(7+host.length); 
+						$.showPreloader();
+						window.control.PlayPath("http://"+newaddr//devno
+							,0) ;						
+						 
+                      }
+         });
+} 
+				
+function getstatus(){
+	 
+	if($("a.active.tab-link")[0].href.split("#")[1]=="tab2"
+		|| $("a.active.tab-link")[0].href.split("#")[1]=="tab3"){	
+	
+	$.ajax({
+             type: "GET",
+             url: "http://"+desthost+":1960/info?",
+             data: "",
+			 timeout:10000,  			 
+             dataType: "json",
+			 error:function(jqXHR, textStatus, errorThrown){
+				if(textStatus=="timeout"){
+					alert("none!");				  
+				}else{				  
+				}
+			},
+			 success: function(data){  
+						
+						$(".ratelabel")[0].innerHTML=data.p2p.rateserver+"KB/s";
+						$(".ratelabel")[1].innerHTML=data.p2p.ratep2p+"KB/s";
+						$(".ratelabel")[2].innerHTML=data.p2p.rateupload+"KB/s";
+						$(".ratelabel")[3].innerHTML=data.p2p.users.length;
+						$(".playlabel")[0].innerHTML=data.play.error+"";
+						  
+						while($("#users li").length-1<data.p2p.users.length){
+							listinsert("#users","");
+						}
+						
+						while($("#users li").length-1>data.p2p.users.length)
+							$("#users li:last-child").remove();
+						 for(var k=0;k<data.p2p.users.length;k++)
+							$("#users li .item-title")[k+1].innerHTML=data.p2p.users[k].ip;
+                      }
+			 }); 
+	}
+}				
+function onbeforeunload(){
+	if(port)
+	$.ajax({
+             type: "GET",
+             url: "http://"+desthost+":1960/Close?Port="+port,
+             data: "",
+			 timeout:10000,  			 
+             dataType: "json"
+			 }); 
+	 
+} 	
+	  
+function load(){		
+	
+	setInterval("getstatus()",1000)
+	//p2ptest(playlist.list[0],0); 
+	
+	if(pc_flag){ 
+		$("iframe")[0].style.display="block";
+		$("iframe")[0].style.width="100%";
+		$("iframe")[0].style.height="100px";
+	}
+	for(k=0;k<playlist.list.length;k++)		insertItem(playlist.list[k]);
+} 
+function play(){
+
+//var video01 = document.getElementById("video01");    video01.play(); 
+} 
+function listset(list,value){
+} 
+function listinsert(list,value){
+	var node=$(list+" li:first-child")[0];
+	var cloned ;
+	cloned = node.cloneNode(true);
+	cloned.style.display="";   
+	node.parentNode.insertAdjacentElement("beforeEnd",cloned); 
+	$(list+" li:last-child .item-title")[0].innerHTML=value;
+}
+function insertItem(value){
+	var node=$("#m3u8 li:first-child")[0];
+	var cloned ;
+	cloned = node.cloneNode(true);
+	cloned.style.display="";   
+	node.parentNode.insertAdjacentElement("beforeEnd",cloned); 
+	$("#m3u8 li:last-child .item-title")[0].innerHTML=value;
+}
+function openurl(){
+	var oldlen=playlist.list.length;
+	p2ptest($("#search")[0].value,0);
+	{
+		devno=$("#search")[0].value;
+		var findf=0;
+		for(var k=0;k<playlist.list.length;k++)
+			if(playlist.list[k]==devno) findf=1;
+		if(!findf)
+		{
+			playlist.list.push(devno);
+			insertItem($("#search")[0].value);
+			setCookie("playlist",JSON.stringify(playlist));			
+		}
+	} 
+}
+function clearurl(){
+	var node=$("#m3u8 li:first-child")[0];
+	var node2=node.parentNode;
+	var cloned=node.cloneNode(true);
+	$("#m3u8 li").remove();
+	node2.insertAdjacentElement("beforeEnd",cloned); 
+	while(playlist.list.length)
+	playlist.list.splice(0, 1);
+	setCookie("playlist",JSON.stringify(playlist));
+}
+pcport=0;
+function playpc( devno){
+	desthost="192.168.1.121";
+	var sucf=1;
+	if(pcport)
+	{
+	sucf=0;
+	$.ajax({
+             type: "GET",
+             url: "http://"+desthost+":1960/Close?Port="+pcport,
+             data: "",
+			 async:false,
+			 timeout:10000,  			 
+             dataType: "json",
+             success: function(data){ 
+				sucf=1;
+			 }
+			 }); 
+	}
+	if(!sucf) return;
+	fid=0;
+	var host=devno.substr(7).split("/")[0]; 	
+	var act="CreateRtmpService"; 
+	if(devno.substr(0,4)=="http")
+		act="CreateHlsService";
+	$.ajax({
+             type: "GET",
+             url: "http://"+desthost+":1960/?Action="+act+"&Domain="+host,
+             data: "",
+			 timeout:1000,  			 
+             dataType: "json",
+			 error:function(jqXHR, textStatus, errorThrown){
+				if(textStatus=="timeout"){
+					alert("未检测到PPeasy服务，请安装PPeasy管理助手软件并启动服务!");				  
+				}else{				  
+				}
+			},
+             success: function(data){ 
+						port=data.port; 
+						pcport=port;
+						var newaddr=""+desthost+":"+port+devno.substr(7+host.length); 
+						 
+						if(act=="CreateRtmpService")
+							$("iframe")[fid].src="/playswf.html?rtmp://"+newaddr; 
+						else
+							$("iframe")[fid].src="/hls/?http://"+newaddr; 
+                      }
+         });
+}
+
+
+</script>
+
+  </head>
+  <body onload=' load();' onbeforeunload="onbeforeunload()" >
+ 
+    <div class="page-group">
+        <div class="page page-current">
+		
+		<nav class="bar bar-tab">
+  <a class="tab-item external active" href="#">
+    <span class="icon icon-home"></span>
+    <span class="tab-label">首页</span>
+  </a>
+  <a class="tab-item external" href="javascript:window.location.reload();">
+    <span class="icon icon-me"></span>
+    <span class="tab-label">刷新</span>
+    <span class="badge">2</span>
+  </a>
+  <a class="tab-item external" href="javascript:window.control.showView(0);">
+    <span class="icon icon-star"></span>
+    <span class="tab-label">文案</span>
+  </a>
+  <a class="tab-item external" href="#">
+    <span class="icon icon-cart"></span>
+    <span class="tab-label">文案</span>
+  </a>
+  <a class="tab-item external" href="#">
+    <span class="icon icon-settings"></span>
+    <span class="tab-label">设置</span>
+  </a>
+</nav>
+
+<div class="content">
+  <div class="buttons-tab">
+    <a href="#tab1" class="tab-link active button">播放列表</a>
+    <a href="#tab2" class="tab-link button">播放状态</a>
+    <a href="#tab3" class="tab-link button">P2P状态</a>
+  </div>
+  <div class="content-block">
+    <div class="tabs">
+      <div id="tab1" class="tab active">
+        <div class="content-block" >
+		<div class=row style="margin-top:10px;">    <div class="search-input col-80">
+      <input type="search" id='search' placeholder='输入要打开的网址...'/>
+    </div>
+    <a class="button button-fill button-primary col-20" href="javascript:openurl()">打开</a></div>
+		<div  style="margin-top:10px;">M3U8播放列表</div>
+  <div class="list-block">
+	<iframe style="display:none"></iframe>
+    <ul id="m3u8">
+      <li class="item-content item-link" style="display:none">
+        
+        <div class="item-inner" onclick="p2ptest(this.childNodes[1].innerHTML,0)">
+          <div class="item-title"></div>
+          <div class="item-after">播放</div>
+        </div>
+      </li> 
+    </ul>
+	<br>
+	<div class=row>
+	<a class="button button-fill button-primary col-20" href="javascript:clearurl()">清空</a><span class="col-80"></span>
+  </div><br>
+        </div>
+      </div>
+	  </div>
+      <div id="tab2" class="tab">
+        <div class="content-block">
+          <p>下载速率：<label class="ratelabel"></label></p>
+          <p>P2P下载：<label class="ratelabel"></label></p>
+          <p>P2P上传：<label class="ratelabel"></label></p>
+          <p>P2P连接：<label class="ratelabel"></label></p>
+          <p>重连次数：<label class="playlabel"></label></p>
+        </div>
+      </div>
+      <div id="tab3" class="tab">
+        <div class="content-block">
+          <div  style="margin-top:10px;">用户列表</div>
+			  <div class="list-block">
+				<ul id="users">
+				  <li class="item-content  " style="display:none">
+					<div class="item-inner" onclick="p2ptest(this.childNodes[1].innerHTML,0)">
+					  <div class="item-title"></div>
+					</div>
+				  </li>  
+				</ul>
+			  </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        </div>
+    </div>
+
+
+    <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script>
+
+  </body>
+</html>
