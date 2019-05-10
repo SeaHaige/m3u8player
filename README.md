@@ -1,4 +1,4 @@
-m3u8player是一个P2P播放器，支持Android、IOS平台。
+m3u8player提供了网页和app播放方式播放m3u8直播源和点播链接，全面支持Windows、Android、IOS平台。
 
 基于ppeasy开发，P2P方式播放M3U8/HLS直播源，观众越多,播放越流畅。
 
