@@ -1,0 +1,49 @@
+2-3-2015: added Inter Worker Communication Protocol to support multiple workers (IWCP)
+28-2-2015: updated source
+27-2-2015: It works! Commercially sponsored by nginx for Windows, coding by vozlt
+
+EBLB (Elastic Backend Load Balancer)
+
+Upstream status and control, a mod for ngx_http_lua_upstream_module.c
+https://github.com/openresty/lua-upstream-nginx-module
+
+Files:
+upstreamcontrol.lua			Lua code to change upstream peer runtime values
+upstreamstatus.lua			Lua code to view upstream status (GUI)
+upstream_candc.conf			nginx config for testing and serve as an example
+iworkcomproto.lua			Inter Worker Communication Protocol
+nb. set 'iwcp_debug = nil' to log only iwcp messages/results
+-----
+Place .conf/.lua files in nginx/conf
+
+
+run example	: nginx -c ./conf/upstream_candc.conf
+http view	: http://127.0.0.1/upstreamstatus
+curl 		: curl -i "http://127.0.0.1/upstreamcontrol?down=true&peer=0&stream=luaupstfoo"
+curl 		: curl -i "http://127.0.0.1/upstreamcontrol?addr=192.168.169.9&peer=0&stream=luaupstfoo"
+curl 		: curl -i "http://127.0.0.1/upstreamcontrol?addr=192.168.169.2:85&peer=0&stream=luaupstfoo"
+NB. either use allow/deny for management IP addresses or auth_basic to prevent someone else from
+changing your upstreams.
+
+
+Issues:
+1. To change the port add it to the addr field, don't use total value larger then set in your
+   nginx.conf file! (always use IP address:port in your upstreams)
+2. Ipv6 not tested
+see also https://groups.google.com/forum/#!topic/openresty-en/wt_9m7GvROg (links to c source)
+
+
+Use cases:
+1. Create a large number of upstream servers in one upstream block, set 75% as down and
+   switch numbers online as needed.
+2. Move large attacks on a upstream to a part of the pool configured to deal with this.
+3. Allow script access (curl) when a server is going down mark it down via it's shutdown script.
+4. Take backends down while maintenance is being done and back up with a single click
+   or script.
+5. Scale the number of backends (down/up) based on external monitoring.
+6. Swap servers between upstreams by changing their ip address.
+
+
+Why not via DNS resolving?
+DNS can be too slow, not under your control, not allowing changes, remote DNS can go offline,
+not fast enough when redirecting attacks, etc...

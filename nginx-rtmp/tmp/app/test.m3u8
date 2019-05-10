@@ -1,0 +1,16 @@
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:6
+#EXT-X-TARGETDURATION:5
+#EXTINF:5.000,
+test-6.ts
+#EXTINF:5.000,
+test-7.ts
+#EXTINF:5.000,
+test-8.ts
+#EXTINF:5.000,
+test-9.ts
+#EXTINF:5.000,
+test-10.ts
+#EXTINF:5.000,
+test-11.ts

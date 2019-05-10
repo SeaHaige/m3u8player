@@ -1,0 +1,11 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters]
+"TcpWindowSize"=dword:0000faf0
+"MaxUserPort"=dword:0000F000
+"TcpTimedWaitDelay"=dword:0000001e
+"MaxFreeTWTcbs"=dword:000003E8
+"MaxHashTableSize"=dword:0000800
+"MaxFreeTcbs"=dword:0000800
+"TcpNumConnections"=dword:00fffffe
+

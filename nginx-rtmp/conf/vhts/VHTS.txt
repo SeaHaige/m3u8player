@@ -1,0 +1,35 @@
+nginx for Windows
+http://nginx-win.ecsds.eu/
+
+
+nginx-module-vts (Virtual host traffic status)
+
+
+http {
+...........
+    vhost_traffic_status_zone shared:vhts:1m;
+...........
+    server {
+        listen       80;
+...........
+         location /ngxvtstatus {
+             vhost_traffic_status_display;
+             vhost_traffic_status_display_format html;
+         }
+
+
+
+Place vtsvalues*.js files in the root where 'location /ngxvtstatus' (or nginx root) is located, check
+your logfiles if you are not seeing updates in the web frontend (404, javascript files not found).
+Some default values are build in, the .js files overrides them when required.
+
+
+
+Adjust the values in the vtsvalues*.js files when required to your needs.
+
+
+NB. either use allow/deny for management IP addresses or auth_basic to prevent someone else from
+viewing the status.
+
+
+Enjoy!

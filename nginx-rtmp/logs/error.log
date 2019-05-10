@@ -1,0 +1,17 @@
+2019/05/10 15:11:04 [emerg] 6420#8756: CreateFile() "D:\1\nginx 1.7.11.3 Gryphon/conf/nginx.conf" failed (2: The system cannot find the file specified)
+2019/05/10 15:14:51 [emerg] 8764#5852: CreateDirectory() "/tmp/app" failed (3: The system cannot find the path specified)
+2019/05/10 15:15:25 [emerg] 8208#2600: CreateDirectory() "/tmp/app" failed (3: The system cannot find the path specified)
+2019/05/10 15:16:02 [emerg] 7656#3376: CreateDirectory() "/tmp/app" failed (3: The system cannot find the path specified)
+2019/05/10 15:19:03 [emerg] 5416#7412: CreateDirectory() "/tmp/app" failed (3: The system cannot find the path specified)
+2019/05/10 15:19:05 [emerg] 7940#9424: CreateDirectory() "/tmp/app" failed (3: The system cannot find the path specified)
+2019/05/10 15:19:06 [emerg] 6684#10072: CreateDirectory() "/tmp/app" failed (3: The system cannot find the path specified)
+2019/05/10 15:20:38 [emerg] 7696#9972: CreateDirectory() "nginx-rtmp-module/tmp/app/" failed (3: The system cannot find the path specified)
+2019/05/10 15:21:01 [notice] 9580#8372: sockinit() attempting to access sockapi
+2019/05/10 15:21:01 [notice] 9580#8372: Access to sockapi succeded!
+2019/05/10 15:21:01 [notice] 9580#8372: using sockapi from "4;108;"
+2019/05/10 15:22:32 [notice] 6908#6504: sockinit() attempting to access sockapi
+2019/05/10 15:22:32 [notice] 6908#6504: Access to sockapi succeded!
+2019/05/10 15:22:32 [notice] 6908#6504: using sockapi from "4;36;"
+2019/05/10 15:22:57 [notice] 5540#6344: sockinit() attempting to access sockapi
+2019/05/10 15:22:57 [notice] 5540#6344: Access to sockapi succeded!
+2019/05/10 15:22:57 [notice] 5540#6344: using sockapi from "4;36;"

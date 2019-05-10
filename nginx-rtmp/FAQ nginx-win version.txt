@@ -1,0 +1,139 @@
+
+=== nginx for Windows ===
+
+Builds can be found here:
+  http://nginx-win.ecsds.eu/
+  Follow releases https://twitter.com/nginx4Windows
+
+FAQ, 12 December 2014
+
+1. Q: How do the version number and name come together?
+   A: The version number follows nginx release version numbers + a subversion number specific to
+      these Windows releases + a random theme name based on Alice in Wonderland
+
+2. Q: Why did you not compile in all c++ dependencies? (vcredist)
+   A: These dependencies are not always the same between Windows versions, with the current native
+      build it will run on any supported Windows OS
+
+3. Q: Are the sources available?
+   A: Not yet, there is still no time table when the sources will be released, I am not finished
+      yet with this project, when it's time it will go to github
+
+4. Q: Isn't using select slow?
+   A: No, select is not slow, it's only seems cpu hungry but not in way that hinders high
+      performance usage, Linux really suffers with select but not Windows despite the Linux
+      slander about this, our select-boost api has solved this issue
+
+5. Q: Is this a long term project?
+   A: We will support this project until the cows come home or until we release the sources,
+      whichever comes first :)
+
+6. Q: Do you port every change?
+   A: No is the short answer, there is a complex evaluation process which determines if a
+      change is valid or not, it’s not just nginx code but add-on’s code interactions which needs
+      to be evaluated
+
+7. Q: Why can’t I change drives?
+   A: You can but you need to write a path like Linux, D:\Path becomes d:/Path
+
+8. Q: Where is the documentation?
+   A: There isn’t any! Because it is already there;
+      nginx: http://nginx.org/en/ and http://nginx.org/en/docs/
+      Lua: http://wiki.nginx.org/HttpLuaModule 
+      Naxsi: https://github.com/nbs-system/naxsi/wiki 
+      Rtmp: https://github.com/arut/nginx-rtmp-module/wiki/Directives 
+      HttpSubsModule https://github.com/yaoweibin/ngx_http_substitutions_filter_module 
+      echo-nginx-module: https://github.com/agentzh/echo-nginx-module 
+      ngx_http_lower_upper_case: https://github.com/replay/ngx_http_lower_upper_case 
+      headers-more-nginx-module: https://github.com/agentzh/headers-more-nginx-module 
+      ngx_http_auth_ldap2 (experimental): https://github.com/kvspb/nginx-auth-ldap 
+      set-misc-nginx-module: https://github.com/agentzh/set-misc-nginx-module 
+      lua-upstream-nginx-module: https://github.com/agentzh/lua-upstream-nginx-module 
+      encrypted-session-nginx-module: https://github.com/agentzh/encrypted-session-nginx-module 
+      Nginx-limit-traffic-rate-module: https://github.com/bigplum/Nginx-limit-traffic-rate-module 
+      Rdns: https://github.com/flant/nginx-http-rdns 
+      AJP: https://github.com/yaoweibin/nginx_ajp_module 
+      form-input-nginx-module: https://github.com/calio/form-input-nginx-module 
+      upstream_jdomain: https://github.com/wdaike/ngx_upstream_jdomain 
+      cache_purge: https://github.com/FRiCKLE/ngx_cache_purge/ 
+      http-concat: https://github.com/alibaba/nginx-http-concat/ 
+      Take care using any examples which has references to Linux paths
+
+9. Q: What determines changes or addons to be added?
+   A: It must be useful, it must be an add-on unless the change is minimal and low 
+      impact on the core, it must compile cleanly under Windows, it can’t have external
+      dependencies unless it can be linked to a single dll module, it must not use OS exclusive
+      functionality. Add-ons are not removed once they are in unless they are bugged
+      beyond repair
+
+10. Q: nginx stop/reload on Windows fails with a ‘Access is denied’
+    A: Run the nginx service as a user (and jail that user), then create a simple cmd file;
+      - runas /savecred /env /user:nginxuser "nginx -s reload"
+      - choice /ty,2 /C:ync
+      - runas /savecred /env /user:nginxuser "nginx -s reopen"
+      At the first run you need to enter nginxuser's password, after that '/savecred' will take
+      care of this
+
+11. Q: XP is no longer supported after april 2014, are you going to stop support nginx/xp?
+    A: Are you a lemming? Neither are we, we will keep supporting XP until it’s technically
+      impossible. nginx for Windows native build runs on Windows XP SP3 and higher,
+      both 32 and 64 bit
+
+12. Q: Sometimes we see a delay with LAN traffic, nginx is not doing anything but the request is stalling
+    A: Make sure you have deactivated netbios (smb) from the lan interface(s)
+
+13. Q: Does naxsi work for phpbb?
+    A: Yes it does, but you need to add a few white-list lines:
+      BasicRule wl:1000 "mz:$URL:/ucp.php|BODY|NAME";
+      BasicRule wl:1310 "mz:$URL:/ucp.php|BODY|NAME";
+      BasicRule wl:1311 "mz:$URL:/ucp.php|BODY|NAME";
+
+14. Q: What is nginx_basic?
+    A: Basically a one on one replacement for the windows nginx version which is made by nginx
+      themselves but with all the benefits and work that has gone into its big brother, which you find
+      here, without add-ons
+
+15. Q: WSARecv() failed (10054: An existing connection was forcibly closed by the remote host)
+      while reading upstream (backend = tomcat, java or similar applications)
+    A: apply these settings to the proxy: 
+      keepalive_requests 500;
+      proxy_http_version 1.1;
+      context: 	http, server, location
+      Version 1.1 is recommended for use with keepalive connections
+
+16. Q: Windows Server 2012 message that msvcr100.dll is missing?
+    A: In some cases:
+      remove manually "C:\Windows\System32\msvcr100.dll" and (Re)install the program 
+      vcredist_x64 from here http://nginx-win.ecsds.eu/
+      In other cases:
+      Install both the 32-bit C++ Runtime and the 64-bit version as well
+
+17. Q: Is this version production ready? And who is using it in production?
+    A: Yes it is! And has been for a while, we are using it in a production environment and
+      we are aware there are quite a few others running our builds
+
+18. Q: Did the FD table size increase or am I seeing things?
+    A: It has increased twofold following an internal Beta and a request to allow more 
+      sustained power with a single worker
+
+19. Q: Do I need the openssl files?
+    A: No! what you have seen is an openssl archive on the download site which has 
+      nothing to do with nginx for Windows, there is no need to download or use it
+
+20. Q: Do I need lua51.dll?
+    A: With nginx.exe you do need it, nginx_basic.exe does not need this library
+
+21. Q: What do I do when people say "don’t run nginx under Windows" and "it’s not designed
+      for Windows" ?
+    A: It depends on your mood, we suggest you reply with "maybe it is time you get your head
+      unstuck from your ignorant behind", but hey, it is only a suggestion
+
+22. Q: Can I use other DLL functions with Lua and import them?
+    A: Yes but they need to be compiled against http://luajit.org/download.html (at the
+      moment v2.0.3), use 'findstr "LuaJIT " lua51.dll' to see which version we have shipped,
+      functions can be used for example: 'local functionname = package.loadlib("External.dll",
+      "luaopen_Function");' See also these examples http://www.scilua.org/ljsqlite3.html 
+      ! Introducing ngxLuaDB (nginx Lua Database) powered by nginx for Windows !
+      See the download section
+
+---
