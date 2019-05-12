@@ -1,9 +1,12 @@
 m3u8player提供了网页和app播放方式播放m3u8直播源和点播链接，全面支持Windows、Android、IOS平台。
 
 HLS.js是网页HTML5版的m3u8播放器,支持chrome、FIREFOX等浏览器。
+
 Demo : https://seahaige.github.io/m3u8player/HLS.js/index.html
 
 flashls-dev是flash版的m3u8播放器，可在IE、Chrome下运行。
+
+Demo : https://seahaige.github.io/m3u8player/flashls-dev/examples/flowplayer
 
 nginx-rtmp是HLS服务器，在windows下运行。
 OBS的推流路径:rtmp://127.0.0.1/hls/test
